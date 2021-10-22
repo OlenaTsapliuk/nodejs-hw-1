@@ -1,8 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
 const crypto = require("crypto");
-const { writeFile } = require("fs");
-const chalk = require("chalk");
 
 const id = crypto.randomInt(1, 256);
 const contactsPath = path.join(__dirname, "db", "contacts.json");
@@ -26,11 +24,15 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   const contacts = await readContact();
-  const filteredContacts = contacts.filter(
-    (contact) => contact.id != contactId
-  );
-  await fs.writeFile(contactsPath, JSON.stringify(filteredContacts, null, 2));
-  return console.table(filteredContacts);
+
+  const idx = contacts.findIndex(({ id }) => Number(id) === Number(contactId));
+  if (idx === -1) {
+    throw new Error(`Contact with id=${contactId} not found`);
+  }
+  const newContacts = contacts.filter(({ id }) => id != contactId);
+  const updateContacts = await JSON.stringify(newContacts);
+  await fs.writeFile(contactsPath, updateContacts);
+  console.table(newContacts);
 };
 
 const addContact = async (name, email, phone) => {
@@ -38,7 +40,7 @@ const addContact = async (name, email, phone) => {
   const newContact = { id, name, email, phone };
   contacts.push(newContact);
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return console.table(newContact);
+  console.table(newContact);
 };
 
 module.exports = {

@@ -39,13 +39,15 @@ const argv = program.opts();
         break;
 
       case "add":
-        const contact = await addContact(name, email, phone);
+        await addContact(name, email, phone);
         console.log(chalk.green("Successfully added"));
         break;
 
       case "remove":
-        const contactRemove = await removeContact(id);
-        console.log(chalk.greenBright("Successfully deleted"));
+        await removeContact(id);
+        console.log(
+          chalk.greenBright(`Contact with id=${id} successfully deleted`)
+        );
         break;
 
       default:
